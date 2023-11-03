@@ -11,6 +11,8 @@ def blur(img,metodo):
             return cv2.blur(img, ksize=(9,9))
         case 2:
             return cv2.GaussianBlur(img, ksize=(9,9),sigmaX=30,sigmaY=30)
+        case 3: 
+            return cv2.medianBlur(img, 5)
 
 def resize(img,size):
     return cv2.resize(img,None,fx=size, fy=size, interpolation = cv2.INTER_CUBIC)
