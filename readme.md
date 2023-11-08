@@ -1,1 +1,1 @@
-Execute com `python3 ocr.py`
+Execute com `python3 main.py`
