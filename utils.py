@@ -1,4 +1,5 @@
 import os
+import sys
 import cv2
 import numpy as np
 import pytesseract
@@ -16,12 +17,22 @@ def output_file(filename):
     return os.path.join(OUTPUT_FOLDER, filename)
 
 
-def mostrar(img, PPimg):
-    cv2.imshow("PPimg", redimensionar(PPimg, 1 / 8))
-    cv2.imshow("Original", redimensionar(img, 1 / 2))
+def mostrar(img, PPimg, arquivo):
+    match arquivo:
+        case "IMG_0122":
+            cv2.imshow("PPimg", redimensionar(PPimg, (1 / 8)))
+            cv2.imshow("Original", redimensionar(img, (1 / 2)))
 
+        case "MobPhoto_1":
+            pass
+        case "MobPhoto_5":
+            cv2.imshow("PPimg", redimensionar(PPimg, (1 / 3)))
+            cv2.imshow("Original", redimensionar(img, (1 / 3)))
+            
+            # concatenado = cv2.hconcat([PPimg, img])
+            # cv2.imshow("antesdepois.jpg", redimensionar(concatenado, (1 / 3)))
 
-def log(arquivo, PPimg):
+def log(PPimg, arquivo):
     f = open(output_file(arquivo + ".txt"), "w")
     f.write(pytesseract.image_to_string(PPimg, config=custom_config))
     f.close()
@@ -66,12 +77,35 @@ def limiarizar(img):
     return cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
 
-def preProcessamento(img):
-    img = redimensionar(img, 4)
+def corrigirPerspectiva(img, arquivo):
+    match arquivo:
+        case "MobPhoto_1":
+            pass
+        case "MobPhoto_5":
+            pts1 = np.float32([[280, 180], [1625, 210], [47, 1520], [1860, 1520]])
+            pts2 = np.float32([[0, 0], [1536, 0], [0, 2048], [1536, 2048]])
+            matriz = cv2.getPerspectiveTransform(pts1, pts2)
+
+            return cv2.warpPerspective(img, matriz, (1536, 2048))
+
+
+def preProcessamento(img, arquivo):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    match arquivo:
+        case "IMG_0122":
+            img = redimensionar(img, 4)
+            img = limiarizar(img)
+            return img
+        case "MobPhoto_1":
+            pass
+        case "MobPhoto_5":
+            img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            img = corrigirPerspectiva(img, arquivo)
+
+            return img
+
     # img = nitidizar(img)
     # img = blur(img, 2)
-    img = limiarizar(img)
     # img = dilatar(img)
     # img = erodir(img)
     # img = arestas(img, 105, 127)
-    return img
