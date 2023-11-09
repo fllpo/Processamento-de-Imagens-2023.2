@@ -22,20 +22,19 @@ def mostrar(img, PPimg, arquivo):
         case "IMG_0122":
             cv2.imshow("PPimg", redimensionar(PPimg, (1 / 8)))
             cv2.imshow("Original", redimensionar(img, (1 / 2)))
-
         case "MobPhoto_1":
             pass
         case "MobPhoto_5":
-            cv2.imshow("PPimg", redimensionar(PPimg, (1 / 3)))
+            cv2.imshow("PPimg", redimensionar(PPimg, (1 / 9)))
             cv2.imshow("Original", redimensionar(img, (1 / 3)))
-            
-            # concatenado = cv2.hconcat([PPimg, img])
-            # cv2.imshow("antesdepois.jpg", redimensionar(concatenado, (1 / 3)))
+
 
 def log(PPimg, arquivo):
+    extract = pytesseract.image_to_string(PPimg, config=custom_config)
     f = open(output_file(arquivo + ".txt"), "w")
-    f.write(pytesseract.image_to_string(PPimg, config=custom_config))
+    f.write(extract)
     f.close()
+    print(extract)
 
 
 def blur(img, metodo):
@@ -62,14 +61,14 @@ def arestas(img, t1, t2):
     return cv2.Canny(img, t1, t2)
 
 
-def dilatar(img):
+def dilatar(img, i):
     k = np.ones((5, 5), np.uint8)
-    return cv2.dilate(img, k, iterations=1)
+    return cv2.dilate(img, k, iterations=i)
 
 
-def erodir(img):
+def erodir(img, i):
     k = np.ones((5, 5), np.uint8)
-    return cv2.erode(img, k, iterations=1)
+    return cv2.erode(img, k, iterations=i)
 
 
 def limiarizar(img):
@@ -95,17 +94,19 @@ def preProcessamento(img, arquivo):
         case "IMG_0122":
             img = redimensionar(img, 4)
             img = limiarizar(img)
+            img = erodir(img, 2)
             return img
         case "MobPhoto_1":
             pass
         case "MobPhoto_5":
             img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
             img = corrigirPerspectiva(img, arquivo)
-
+            img = redimensionar(img, 4)
+            img = limiarizar(img)
+            img = dilatar(img, 1)
             return img
 
     # img = nitidizar(img)
     # img = blur(img, 2)
     # img = dilatar(img)
-    # img = erodir(img)
     # img = arestas(img, 105, 127)

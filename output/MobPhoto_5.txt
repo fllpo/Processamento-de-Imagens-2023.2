@@ -1,37 +1,40 @@
-* 4 % 4
-ce A
-Hi u
-QA ee i
-TRE am
-CERT MOO aL Le ya &
+| My "
+. | : (
+- ° ,
+SAT ine 3.0
+OEE -_
+Compact Code OCR for Mobile Devices :
 What is the ABBYY Mobile OCR Engine SDK?
-The ABBYY Mobile OCR Engine 3.0 Software Development Kit (SDK) is a specialised toolkit
-for empowering mobile and other 'compact® applications with text recognition and Benefits of the
-conversion capabilities. ABBYY's specially developed "compact code OCR" is optimised to ABBYY OCR Engine SDK
-deliver a highly accurate conversion of image files into text using a small amount of
-memory and system resources, Platform independence ensures support for such operating - Easy integration of high
+Me ABBY) Mobile OCR Engine 3.0 Software Development Kit (SDK) is a specialised toolkit
+fur empowering mobile and other compact applicalons with text recognition and Benefits of the
+conversion capabilities. ABBYY's specially developed “compact cade OCR" is optimised €0 ABBYY OCR Engine SDK
+deliver a highly accurate conversion of image files Inte text using a small amount of
+Memory and system resources. Platform independence ensures Support for such operating . Easy integration of high
 systems as Android, Linux, Symbian, Windows and Windows Mobile. performance text recognition
 capabilities
-Your Mobile Application with the Power of OCR + Business card recognition
-ABBYY OCR technology transforms images into manageable text which can be saved, stored, edited . Platform independence -
-ile OCR Engine 3.0 will P
-oF sent via web, web services, email or SMS. Applications based on the Mobile 0! ng supporting such systems as
-transform notes, business cards, newspaper clippings, menus and other texts captured via a mobile Widens Mbblle, S
-imaging device into data which can easily be embedded into other applications. Examples of appli- In oe 0) re ymbian,
-cations which can be enhanced with ABBYY Mobile OCR Engine include: Android™ and Linux Systems
-: Fe canoleselen + Optimised memory
-Camera Smartphone/PDA Applications: Capture Front-ends Kink f jacken management and efficient
-Take full advantage of cameras on mobile Systems and Web Applications loading for high performance
-devices. Photo menus, signs and posters, Exisiting applications can be improved or
+| . , . Business card recognition
+Your Mobile Application with the Power of OCR E
+ABBYY OCR technulogy transturins images Ino manageable text which can be saved, stored, edited _ Platform independence -
+or Sent via web, web services. email or SMS. Applications based oe ~ eee en supporting such systems as
+transform ¢ ~ narde newspaper clippings, menus and other texts captur | |
+orm notes, business cards, NEWSPaf IDPINg + sol Windows Mobile, Symbian,
+Imaging device into data which can easily be embedded into other applications. Examples of appli ony |
+cations which can be enhanced with ABBYY Mobile OCR Engine include: Android™ and Linux systems
+Backend - Optimised memory
+‘cations: acken _
+Camera Smartphone/PDA Applications: Capture Front-ends Linked to management and efficient
+Take full advantage of cameras on moodile Systems and Web Applications loading for high performance
+devices. Photo menus, signs and posters, Fxisiting applications can be improved Or
 business cards, and other documents can be extended using OCR for easy capture of input - Multilingual support
-converted into text for easier input into @ of data to a networked backend system or
-variety of applications such as: Web applicaition. For example: - Sample application and
-+ Phone and address books + Mobile capture for CRM - take a picture of test shell
-+ Calendars a business card for input into a CRM ae
-pearaciiliets system or sales lead database + Sophisticated OCR
-i functionality:
-+ Alkin-one personal information + Mobile capture for Workflow - take a
-managers (PIMs) picture of a document for fast input into a - Extremely accurate text
-+ Business card readers workfloyi epnlieetan conversion
-Atlant /earver teyt panvereian and 1 A viet ON ae ale nates
+converted into text for easier input Into 2 of data to a networked backend system Of
+variety of applications such as: Web applicaition. For example: . Sample application and
+- Phone and address books . Mobile capture for CRM - take a picture of test shell
+* Calendars 3 business card for input into a CRM
+- Task lists system or sales lead database - Sophisticated OCR
+| functionality:
+* All-in-one personal information | Mobile capture for Worktlow Lane ?
+managers (PIMs| picture of a document for fast input into 4 . Extremely accurate text
+| workflow application :
+' Business card readers PP conversion
+Aliant /corvor toyt ranvercinn and Ce
 
