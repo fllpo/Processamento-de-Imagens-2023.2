@@ -20,8 +20,9 @@ def output_file(filename):
 def mostrar(img, PPimg, arquivo):
     match arquivo:
         case "IMG_0122":
-            cv2.imshow("PPimg", redimensionar(PPimg, (1 / 8)))
-            cv2.imshow("Original", redimensionar(img, (1 / 2)))
+            # cv2.imshow("PPimg", redimensionar(PPimg, (1 / 8)))
+            cv2.imshow("PPimg", PPimg)
+            # cv2.imshow("Original", redimensionar(img, (1 / 2)))
         case "MobPhoto_1":
             pass
         case "MobPhoto_5":
@@ -62,7 +63,7 @@ def arestas(img, t1, t2):
 
 
 def dilatar(img, i):
-    k = np.ones((5, 5), np.uint8)
+    k = np.ones((3, 85), np.uint8)
     return cv2.dilate(img, k, iterations=i)
 
 
@@ -72,8 +73,9 @@ def erodir(img, i):
 
 
 def limiarizar(img):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(img, (5, 5), 0)
-    return cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+    return cv2.threshold(blur, 80, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
 
 
 def corrigirPerspectiva(img, arquivo):
@@ -89,13 +91,37 @@ def corrigirPerspectiva(img, arquivo):
 
 
 def preProcessamento(img, arquivo):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     match arquivo:
         case "IMG_0122":
-            img = redimensionar(img, 4)
-            img = limiarizar(img)
-            img = erodir(img, 2)
+            h, w, c = img.shape
+
+            if w > 1000:
+                novo_w = 1000
+                ar = w / h
+                novo_h = int(novo_w / ar)
+                img = cv2.resize(img, (novo_w, novo_h), interpolation=cv2.INTER_AREA)
+
+            limiarizado = limiarizar(img)
+            dilatado = dilatar(limiarizado, 1)
+
+            # segmentacao de linha
+            contorno, _ = cv2.findContours(
+                dilatado.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+            )
+            linhas_contorno = sorted(
+                contorno, key=lambda ctr: cv2.boundingRect(ctr)[1]
+            )  # x,y,w,h
+
+            for ctr in linhas_contorno:
+                x, y, w, h = cv2.boundingRect(ctr)
+                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+            # segmentacao de palavra
+
+            # segmentacao de caractere
+
             return img
+
         case "MobPhoto_1":
             pass
         case "MobPhoto_5":
@@ -108,5 +134,4 @@ def preProcessamento(img, arquivo):
 
     # img = nitidizar(img)
     # img = blur(img, 2)
-    # img = dilatar(img)
     # img = arestas(img, 105, 127)
