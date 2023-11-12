@@ -21,8 +21,9 @@ def mostrar(img, PPimg, arquivo):
     match arquivo:
         case "IMG_0122":
             # cv2.imshow("PPimg", redimensionar(PPimg, (1 / 8)))
-            cv2.imshow("PPimg", PPimg)
+            # cv2.imshow("PPimg", PPimg)
             # cv2.imshow("Original", redimensionar(img, (1 / 2)))
+            pass
         case "MobPhoto_1":
             pass
         case "MobPhoto_5":
@@ -95,32 +96,55 @@ def preProcessamento(img, arquivo):
         case "IMG_0122":
             h, w, c = img.shape
 
-            if w > 1000:
-                novo_w = 1000
+            if w > 500:
+                novo_w = 500
                 ar = w / h
                 novo_h = int(novo_w / ar)
                 img = cv2.resize(img, (novo_w, novo_h), interpolation=cv2.INTER_AREA)
 
             limiarizado = limiarizar(img)
-            dilatado = dilatar(limiarizado, 1)
 
-            # segmentacao de linha
-            contorno, _ = cv2.findContours(
+            # segmentacao de linha OK
+
+            k = np.ones((3, 25), np.uint8)
+            dilatado = cv2.dilate(limiarizado, k, iterations=1)
+
+            contorno, hierarquia = cv2.findContours(
                 dilatado.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
             )
-            linhas_contorno = sorted(
+            secao_contorno_ordenada = sorted(
+                contorno, key=lambda ctr: cv2.boundingRect(ctr)[1]
+            )  # x,y,w,h
+            PPimg_linha = img.copy()
+
+            for ctr in secao_contorno_ordenada:
+                x, y, w, h = cv2.boundingRect(ctr)
+                cv2.rectangle(PPimg_linha, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+            cv2.imshow("segmentacao de linhas", PPimg_linha)
+
+            # segmentacao de palavra OK
+
+            dilatado = cv2.dilate(limiarizado, np.ones((3, 4), np.uint8), iterations=1)
+
+            contorno, hierarquia = cv2.findContours(
+                dilatado.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+            )
+            secao_contorno_ordenada = sorted(
                 contorno, key=lambda ctr: cv2.boundingRect(ctr)[1]
             )  # x,y,w,h
 
-            for ctr in linhas_contorno:
+            PPimg_palavra = img.copy()
+
+            for ctr in secao_contorno_ordenada:
                 x, y, w, h = cv2.boundingRect(ctr)
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                cv2.rectangle(PPimg_palavra, (x, y), (x + w, y + h), (255, 255, 100), 2)
 
-            # segmentacao de palavra
+            cv2.imshow("segmentacao de palavras", PPimg_palavra)
 
-            # segmentacao de caractere
+            # segmentacao de caracteres TODO
 
-            return img
+            return PPimg_palavra
 
         case "MobPhoto_1":
             pass
