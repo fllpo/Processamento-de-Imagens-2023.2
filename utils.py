@@ -17,23 +17,10 @@ def output_file(filename):
     return os.path.join(OUTPUT_FOLDER, filename)
 
 
-def mostrar(img, PPimg, arquivo):
-    match arquivo:
-        case "IMG_0122":
-            cv2.imshow("PPimg", PPimg)
-            cv2.imshow("Original", img)
-
-            pass
-        case "MobPhoto_1":
-            pass
-        case "MobPhoto_5":
-            cv2.imshow("PPimg", redimensionar(PPimg, (1 / 9)))
-            cv2.imshow("Original", redimensionar(img, (1 / 3)))
-
-
 def log(PPimg, arquivo):
     extract = pytesseract.image_to_string(PPimg, config=custom_config)
-    f = open(output_file(arquivo + ".txt"), "w")
+    dir_saida = os.path.join("output/" + arquivo + "/log.txt")
+    f = open(dir_saida, "w")
     f.write(extract)
     f.close()
     print(extract)
@@ -72,7 +59,7 @@ def corrigirPerspectiva(img, arquivo):
             return cv2.warpPerspective(img, matriz, (1536, 2048))
 
 
-def redimensionaMostrar(img):
+def redimensionaMostrar(img): #OK
     h, w, c = img.shape
     if w > 500:
         novo_w = 500
@@ -82,7 +69,7 @@ def redimensionaMostrar(img):
     return img
 
 
-def localizacaoTexto(original):
+def segmentacaoTexto(original): #OK
     img = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
     limiarizado = limiarizar(img)
 
@@ -94,57 +81,67 @@ def localizacaoTexto(original):
     secao_contorno_ordenada = sorted(contorno, key=lambda ctr: cv2.boundingRect(ctr)[1])
 
     PPimg_texto = original.copy()
-    lista_textos = []
+    lista_texto = []
 
     for ctr in secao_contorno_ordenada:
         x, y, w, h = cv2.boundingRect(ctr)
-        lista_textos.append([x, y, x + w, y + h])
-        cv2.rectangle(PPimg_texto, (x, y), (x + w, y + h), (100, 255, 100), 2)
+        if (w or h) >= 50:
+            lista_texto.append([x, y, x + w, y + h])
+            cv2.rectangle(PPimg_texto, (x, y), (x + w, y + h), (100, 255, 255), 2)
 
-    PPimg_texto = redimensionaMostrar(PPimg_texto)
+    for i in range(len(lista_texto)):
+        texto = lista_texto[i]
+        saida = img[texto[1] : texto[3], texto[0] : texto[2]]
+        dir_saida = os.path.join(
+            "output/" + str(sys.argv[1]) + "/texto", "texto_" + str(i) + ".jpg"
+        )
+        cv2.imwrite(dir_saida, saida)
 
-    for i in range(len(lista_textos)):
-        texto = lista_textos[i]
+    return lista_texto
+
+
+def segmentacaoLinha(original, lista_texto): #OK
+    img = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
+    lista_linha = []
+    for i in range(len(lista_texto)):
+        texto = lista_texto[i]
         PPimg_texto = img[texto[1] : texto[3], texto[0] : texto[2]]
 
-        return lista_textos
-        # cv2.imshow("texto "+str(i), PPimg_texto)
+        limiarizado = limiarizar(PPimg_texto)
+        dilatado = cv2.dilate(limiarizado, np.ones((5, 39), np.uint8), iterations=1)
+
+        contorno, _ = cv2.findContours(
+            dilatado.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
+        )
+
+        secao_contorno_ordenada = sorted(
+            contorno, key=lambda ctr: cv2.boundingRect(ctr)[1]
+        )  # x,y,w,h
+
+        PPimg_linha = cv2.cvtColor(PPimg_texto, cv2.COLOR_GRAY2BGR).copy()
+        for ctr in secao_contorno_ordenada:
+            x, y, w, h = cv2.boundingRect(ctr)
+            lista_linha.append([x, y, x + w, y + h])
+            cv2.rectangle(PPimg_linha, (x, y), (x + w, y + h), (100, 255, 100), 2)
+
+            linha = lista_linha[len(lista_linha) - 1]
+            saida = PPimg_texto[linha[1] : linha[3], linha[0] : linha[2]]
+
+            dir_saida = os.path.join("output/" + str(sys.argv[1]) + "/linha", "linha_" + str(len(lista_linha) - 1) + ".jpg")
+            cv2.imwrite(dir_saida, saida)
+
+    return lista_linha
 
 
-def segmentacaoLinha(original):
+def segmentacaoPalavra(original):  # FIX
     img = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
-    limiarizado = limiarizar(img)
-    dilatado = cv2.dilate(limiarizado, np.ones((5, 39), np.uint8), iterations=1)
 
-    contorno, _ = cv2.findContours(
-        dilatado.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
-    )
-    secao_contorno_ordenada = sorted(
-        contorno, key=lambda ctr: cv2.boundingRect(ctr)[1]
-    )  # x,y,w,h
-    PPimg_linha = original.copy()
+    limiarizado = cv2.threshold(img, 80, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[        1    ]
 
-    for ctr in secao_contorno_ordenada:
-        x, y, w, h = cv2.boundingRect(ctr)
-        cv2.rectangle(PPimg_linha, (x, y), (x + w, y + h), (100, 255, 100), 2)
-
-    PPimg_linha = redimensionaMostrar(PPimg_linha)
-
-    # cv2.imshow("segmentacao de linhas", PPimg_linha)
-
-
-def segmentacaoPalavra(original):  # OK
-    img = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
-    limiarizado = cv2.threshold(img, 80, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[
-        1
-    ]
-    
-    k=cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))  
+    k = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
     dilatado = cv2.dilate(limiarizado, k, iterations=1)
 
-    contorno, _ = cv2.findContours(
-        dilatado.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
-    )
+    contorno, _ = cv2.findContours(        dilatado.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE    )
     secao_contorno_ordenada = sorted(contorno, key=lambda ctr: cv2.boundingRect(ctr)[1])
 
     PPimg_palavra = original.copy()
@@ -155,21 +152,31 @@ def segmentacaoPalavra(original):  # OK
         lista_palavras.append([x, y, x + w, y + h])
         cv2.rectangle(PPimg_palavra, (x, y), (x + w, y + h), (255, 255, 100), 2)
 
+    # cv2.imshow("segmentacao de palavras", redimensionaMostrar(PPimg_palavra))
+
+    for p in range(5):
+        palavra = lista_palavras[p]
+        PPimg_palavra = img[palavra[1] : palavra[3], palavra[0] : palavra[2]]
+        # extract = pytesseract.image_to_string(PPimg_palavra, config=custom_config)
+        dir_saida = os.path.join(
+            "output/" + str(sys.argv[1]) + "/palavra", "palavra_" + str(p) + ".jpg"
+        )
+        cv2.imwrite(dir_saida, PPimg_palavra)
+
     return lista_palavras
 
 
 def segmentacaoCaractere(original, lista_palavras):  # TODO
     img = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
+
     palavra = lista_palavras[2]
     img = img[palavra[1] : palavra[3], palavra[0] : palavra[2]]
 
     limiarizado = cv2.threshold(img, 1, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
-    
-    k=cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))    
+
+    k = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     saida = cv2.erode(limiarizado, k, iterations=2)
     saida = cv2.dilate(saida, k)
-
-    cv2.imshow("saida", saida)
 
     contorno, _ = cv2.findContours(
         saida.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
@@ -189,28 +196,21 @@ def segmentacaoCaractere(original, lista_palavras):  # TODO
         PPimg_caractere = saida[
             caractere[1] : caractere[3], caractere[0] : caractere[2]
         ]
-        
-        cv2.imshow("caractere_" + str(i), PPimg_caractere)
-        #extract = pytesseract.image_to_string(PPimg_caractere, config=custom_config)
-        #print(str(i) + ": " + extract)
+
+    # cv2.imshow("caractere_" + str(i), PPimg_caractere)
+    # extract = pytesseract.image_to_string(PPimg_caractere, config=custom_config)
+    # print(str(i) + ": " + extract)
 
 
 def preProcessamento(img, arquivo):
     match arquivo:
         case "IMG_0122":
-            teste = localizacaoTexto(img)
-            # segmentacaoLinha(img)
-            # segmentacaoPalavra(img)
-            segmentacaoCaractere(img, segmentacaoPalavra(img))
+            segTexto = segmentacaoTexto(img)
+            segLinha = segmentacaoLinha(img, segTexto)
+            # segPalavra = segmentacaoPalavra(img)
+            # segCaractere = segmentacaoCaractere(img, segPalavra)
 
-            # return PPimg_palavra
-
-        case "MobPhoto_1":
-            pass
         case "MobPhoto_5":
             img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
             img = corrigirPerspectiva(img, arquivo)
-            img = redimensionar(img, 4)
-            img = limiarizar(img)
-            img = dilatar(img, 1)
-            return img
+            segTexto = segmentacaoTexto(img)
