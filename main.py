@@ -1,5 +1,6 @@
 from utils import *
 
+
 arquivo = sys.argv[1]
 
 img = cv2.imread(input_file(arquivo + ".jpg"))
