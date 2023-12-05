@@ -49,7 +49,7 @@ def segmentacaoTexto(original):
     custom_config = r"--oem 3 --psm 6"
 
     dir_saida = os.path.join("output/" + str(sys.argv[1]) + "/log.txt")
-    f = open(dir_saida, "a")
+    f = open(dir_saida, "w")
     img = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(img, (5, 5), 0)
     limiarizado = cv2.threshold(blur, 80, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[
@@ -103,6 +103,7 @@ def segmentacaoTexto(original):
             extract = pytesseract.image_to_string(saida, config=custom_config)
             extract = extract[: len(extract) - 2]
             f.write(extract)
+            f.write("\n\n")
 
     dir_saida = os.path.join("output/" + str(sys.argv[1]) + "/segmentação de texto.jpg")
     cv2.imwrite(dir_saida, PPimg_texto)
@@ -276,8 +277,5 @@ def Processamento(img, arquivo):
             img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
             img = corrigirPerspectiva(img, arquivo)
 
-            segmentacaoTexto(img)
-            segmentacaoPalavra(img)
-        case "abbas":
             segmentacaoTexto(img)
             segmentacaoPalavra(img)
