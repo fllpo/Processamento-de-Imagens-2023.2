@@ -7,7 +7,6 @@ import pytesseract
 
 INPUT_FOLDER = "input"
 OUTPUT_FOLDER = "output"
-custom_config = r"--oem 3 --psm 8"
 
 
 def input_file(filename):
@@ -47,8 +46,11 @@ def redimensionar(img):  # OK
 
 
 def segmentacaoTexto(original):
-    img = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
+    custom_config = r"--oem 3 --psm 6"
 
+    dir_saida = os.path.join("output/" + str(sys.argv[1]) + "/log.txt")
+    f = open(dir_saida, "a")
+    img = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(img, (5, 5), 0)
     limiarizado = cv2.threshold(blur, 80, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[
         1
@@ -98,12 +100,17 @@ def segmentacaoTexto(original):
             )
             cv2.imwrite(dir_saida, saida)
 
-    #cv2.imshow("segmentacao de texto", redimensionar(PPimg_texto))
+            extract = pytesseract.image_to_string(saida, config=custom_config)
+            extract = extract[: len(extract) - 2]
+            f.write(extract)
+
     dir_saida = os.path.join("output/" + str(sys.argv[1]) + "/segmentação de texto.jpg")
     cv2.imwrite(dir_saida, PPimg_texto)
+    f.close()
 
 
 def segmentacaoPalavra(original):
+    custom_config = r"--oem 3 --psm 8"
     img = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
     lista_palavra_seg = []
 
@@ -170,7 +177,6 @@ def segmentacaoPalavra(original):
         "output/" + str(sys.argv[1]) + "/segmentação de palavras.jpg"
     )
     cv2.imwrite(dir_saida, PPimg_palavra)
-    #cv2.imshow("segmentacao de palavras", redimensionar(PPimg_palavra))
 
 
 def segmentacaoCaractere(original):  # TODO
@@ -179,12 +185,11 @@ def segmentacaoCaractere(original):  # TODO
     img = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
     lista_palavra_seg = []
 
-    limiarizado = cv2.threshold(img, 180, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[
-        1
-    ]
+    limiarizado = cv2.threshold(img, 1, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
 
-    k = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
+    k = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     opening = cv2.morphologyEx(limiarizado, cv2.MORPH_OPEN, k)
+    opening = cv2.erode(opening, k, iterations=1)
 
     contorno, _ = cv2.findContours(
         opening.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE
@@ -196,7 +201,7 @@ def segmentacaoCaractere(original):  # TODO
     for ctr in secao_contorno_ordenada:
         x, y, w, h = cv2.boundingRect(ctr)
         if w > 10 and h > 10:
-            lista_palavra_seg.append([x, y, x + w, y + h])
+            lista_palavra_seg.append([x - 3, y - 3, x + w + 6, y + h + 6])
             cv2.rectangle(PPimg_palavra, (x, y), (x + w, y + h), (100, 100, 255), 2)
 
             palavra = lista_palavra_seg[len(lista_palavra_seg) - 1]
@@ -205,9 +210,21 @@ def segmentacaoCaractere(original):  # TODO
                 cv2.COLOR_BGR2GRAY,
             )
 
-            saida = cv2.threshold(
-                saida, 180, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
+            saida = cv2.medianBlur(saida, 5)
+
+            k = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+
+            saida = cv2.filter2D(saida, -1, k)
+
+            limiarizado = cv2.threshold(
+                saida, 1, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU
             )[1]
+
+            k = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+            opening = cv2.morphologyEx(limiarizado, cv2.MORPH_OPEN, k)
+            closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, k)
+
+            cv2.imshow("saida", closing)
 
             dir_saida = os.path.join(
                 "output/"
@@ -218,7 +235,7 @@ def segmentacaoCaractere(original):  # TODO
             )
             cv2.imwrite(dir_saida, saida)
 
-            extract = pytesseract.image_to_string(saida, config=custom_config)
+            extract = pytesseract.image_to_string(closing, config=custom_config)
             extract = extract[: len(extract) - 2]
 
             PPimg_palavra = cv2.putText(
@@ -246,7 +263,7 @@ def segmentacaoCaractere(original):  # TODO
         "output/" + str(sys.argv[1]) + "/segmentação de caracteres.jpg"
     )
     cv2.imwrite(dir_saida, PPimg_palavra)
-    #cv2.imshow("segmentacao de caractere", redimensionar(PPimg_palavra))
+    cv2.imshow("segmentacao de caractere", redimensionar(PPimg_palavra))
 
 
 def Processamento(img, arquivo):
@@ -254,11 +271,13 @@ def Processamento(img, arquivo):
         case "IMG_0122":
             segmentacaoTexto(img)
             segmentacaoPalavra(img)
-            segmentacaoCaractere(img)
 
         case "MobPhoto_5":
             img = cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
             img = corrigirPerspectiva(img, arquivo)
+
             segmentacaoTexto(img)
             segmentacaoPalavra(img)
-            segmentacaoCaractere(img)
+        case "abbas":
+            segmentacaoTexto(img)
+            segmentacaoPalavra(img)
