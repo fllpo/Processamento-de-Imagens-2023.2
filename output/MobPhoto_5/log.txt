@@ -1,0 +1,90 @@
+ABBYY
+
+ADDY Y
+\ >
+GUA Ter Coe ft
+mR EMO aU LM a Mac }
+
+What is the ABBYY Mobile OCR Engine SDK?
+
+The ABBYY Mobile OCR Engine 3.0 Software Development Kit (SDK) is a specialised toolkit
+for empowering mobile and other "compact applications with text recognition and
+conversion capabilities. ABBYY's specially developed "compact code OCR" is optimised to
+deliver a highly accurate conversion of image files into text using a small amount of
+memory and system resources, Platform independence ensures support for such operating
+systems as Android, Linux, Symbian, Windows and Windows Mobile.
+
+Benefits of the
+ABBYY OCR Engine SDK
+
+- Easy integration of high
+performance text recognition
+capabilities
+
+- Business card recognition
+
+Your Mobile Application with the Power of OCR
+
+ABBYY OCR technology transforms images into manageable text which can be saved, stored, edited
+or sent via web, web services, email or SMS. Applications based on the Mobile OCR Engine 3.0 will
+transform notes, business cards, newspaper clippings, menus and other texts captured via @ mobile
+imaging device into data which can easily be embedded into other applications. Examples of appli-
+cations which can be enhanced with ABBYY Mobile OCR Engine include:
+
+» Platform independence -
+supporting such systems as
+Windows Mobile, Symbian,
+Android™ and Linux Systems
+
++ Optimised memory
+management and efficient
+loading for high performance
+
+Capture Front-ends Linked to Backend
+
+Systems and Web Applications
+
+Exisiting applications can be improved or
+
+extended using OCR for easy capture of input
+
+of data to a networked backend system or
+
+Web applicaition. For example:
+
++ Mobile capture for CRM - take a picture of
+a business card for input into a CRM
+system or sales lead database
+
++ Mobile capture for Workflow - take a
+picture of a document for fast input into a
+workflow application
+
+Atlant /earvar teyt panvereian and
+
+Camera Smartphone/PDA Applications:
+Take full advantage of cameras on mobile
+devices. Photo menus, signs and posters,
+business cards, and other documents can be
+converted into text for easier input into a
+variety of applications such as:
++ Phone and address books
+* Calendars
+* Task lists
++ All-in-one personal information
+
+managers (PIMs)
+* Business card readers
+
+» Multilingual support
+
+- Sample application and
+test shell
+
++ Sophisticated OCR
+functionality:
+- Extremely accurate text
+conversion
+
+“ava aie ek ee ee Oe ee
+
